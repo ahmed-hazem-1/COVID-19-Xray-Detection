@@ -84,12 +84,10 @@ def main():
         uploaded_file = st.file_uploader("Choose a chest X-ray image...", 
                                          type=["jpg", "jpeg", "png"])
     
-    # Display uploaded image section
+    # Handle file upload and prediction in one flow
     if uploaded_file is not None:
-        st.header("Uploaded Image")
-        with st.container():
-            image_data = uploaded_file.read()
-            st.image(image_data, caption="Uploaded X-ray Image", use_column_width=True)
+        # Read image data once
+        image_data = uploaded_file.read()
         
         # Prediction button section
         st.header("Run Prediction")
@@ -105,11 +103,13 @@ def main():
                 # Make prediction
                 prediction = model.predict(img_input)[0][0]
                 
-                # Preprocessed image section
-                st.header("Preprocessed Image")
+                # Display only the preprocessed image with controlled size
+                st.header("X-ray Analysis")
                 with st.container():
-                    st.image(img_display, caption="Preprocessed Image (224x224, Grayscale)", 
-                             use_column_width=True)
+                    # Display image with smaller size (300px width)
+                    col1, col2, col3 = st.columns([1, 2, 1])
+                    with col2:
+                        st.image(img_display, caption="Processed X-ray Image", width=300)
                 
                 # Diagnosis section
                 st.header("Diagnosis")
