@@ -6,8 +6,6 @@ An AI-powered application that uses deep learning to detect COVID-19 from chest 
 
 This project uses a Convolutional Neural Network (CNN) to classify chest X-ray images as either showing signs of COVID-19 or not. The model was trained on a dataset of X-ray images and achieves good accuracy in distinguishing between COVID-19 positive and negative cases.
 
-![Sample Image](https://github.com/username/COVID-19-Xray-Detection/raw/main/images/app_screenshot.png)
-
 ## Features
 
 - Upload chest X-ray images for analysis
@@ -18,7 +16,7 @@ This project uses a Convolutional Neural Network (CNN) to classify chest X-ray i
 ## Try It Online
 
 You can try the application directly in your browser:
-[COVID-19 X-ray Detection App](https://covid19-xray-detector.streamlit.app/)
+[COVID-19 X-ray Detection App](https://covid-19-xray-detection.streamlit.app/)
 
 ## How It Works
 
@@ -39,8 +37,12 @@ The model uses a CNN architecture with:
 ## Local Setup
 
 ### Prerequisites
-- Python 3.7+
-- pip
+- tensorflow: 2.18.0
+- numpy: 2.0.2
+- opencv-python-headless: 4.11.0.86
+- cv2: 4.11.0
+- pillow: 11.2.1
+- PIL: 11.2.1
 
 ### Installation
 
