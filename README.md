@@ -6,6 +6,8 @@ An AI-powered application that uses deep learning to detect COVID-19 from chest 
 
 This project uses a Convolutional Neural Network (CNN) to classify chest X-ray images as either showing signs of COVID-19 or not. The model was trained on a dataset of X-ray images and achieves good accuracy in distinguishing between COVID-19 positive and negative cases.
 
+![Sample Image](https://github.com/username/COVID-19-Xray-Detection/raw/main/images/app_screenshot.png)
+
 ## Features
 
 - Upload chest X-ray images for analysis
