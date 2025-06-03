@@ -49,9 +49,10 @@ def preprocess_image(image_data):
     return img_input, img_resized
 
 def main():
+    # Title section
     st.title("COVID-19 X-ray Detection")
     
-    # Sidebar
+    # Sidebar information
     st.sidebar.title("About")
     st.sidebar.info(
         "This application uses a Convolutional Neural Network (CNN) "
@@ -77,84 +78,99 @@ def main():
         st.warning("Model could not be loaded. Please check if the model file exists.")
         return
     
-    # Main content
-    col1, col2 = st.columns([1, 1])
-    
-    with col1:
-        st.markdown("## Upload X-ray Image")
+    # Upload section
+    st.header("Upload X-ray Image")
+    with st.container():
         uploaded_file = st.file_uploader("Choose a chest X-ray image...", 
                                          type=["jpg", "jpeg", "png"])
-        
-        if uploaded_file is not None:
-            # Display the uploaded image
+    
+    # Display uploaded image section
+    if uploaded_file is not None:
+        st.header("Uploaded Image")
+        with st.container():
             image_data = uploaded_file.read()
             st.image(image_data, caption="Uploaded X-ray Image", use_column_width=True)
-            
-            # Add a prediction button
-            predict_button = st.button("Predict")
-            
-            if predict_button:
-                with st.spinner("Processing..."):
-                    # Preprocess the image
-                    img_input, img_display = preprocess_image(image_data)
+        
+        # Prediction button section
+        st.header("Run Prediction")
+        with st.container():
+            predict_button = st.button("Predict", use_container_width=True)
+        
+        # Results section (only show after prediction)
+        if predict_button:
+            with st.spinner("Processing..."):
+                # Preprocess the image
+                img_input, img_display = preprocess_image(image_data)
+                
+                # Make prediction
+                prediction = model.predict(img_input)[0][0]
+                
+                # Preprocessed image section
+                st.header("Preprocessed Image")
+                with st.container():
+                    st.image(img_display, caption="Preprocessed Image (224x224, Grayscale)", 
+                             use_column_width=True)
+                
+                # Diagnosis section
+                st.header("Diagnosis")
+                with st.container():
+                    prediction_percentage = prediction * 100
                     
-                    # Make prediction
-                    prediction = model.predict(img_input)[0][0]
+                    if prediction > 0.5:
+                        st.error(f"COVID-19 Positive (Confidence: {prediction_percentage:.2f}%)")
+                        st.markdown("""
+                            ⚠️ This result suggests the X-ray shows signs consistent with COVID-19.
+                            
+                            **Important Note**: This is not a medical diagnosis. Please consult a healthcare professional.
+                        """)
+                    else:
+                        st.success(f"COVID-19 Negative (Confidence: {(100-prediction_percentage):.2f}%)")
+                        st.markdown("""
+                            ✅ This result suggests the X-ray does not show signs consistent with COVID-19.
+                            
+                            **Important Note**: This is not a medical diagnosis. Please consult a healthcare professional.
+                        """)
+                
+                # Prediction probability section
+                st.header("Prediction Probability")
+                with st.container():
+                    prob_df = {
+                        "COVID-19 Positive": prediction_percentage,
+                        "COVID-19 Negative": 100 - prediction_percentage
+                    }
                     
-                    # Display results in the second column
-                    with col2:
-                        st.markdown("## Prediction Result")
-                        
-                        # Show preprocessed image
-                        st.image(img_display, caption="Preprocessed Image (224x224, Grayscale)", 
-                                 use_column_width=True)
-                        
-                        # Display prediction
-                        st.markdown("### Diagnosis")
-                        prediction_percentage = prediction * 100
-                        
-                        if prediction > 0.5:
-                            st.error(f"COVID-19 Positive (Confidence: {prediction_percentage:.2f}%)")
-                            st.markdown("""
-                                ⚠️ This result suggests the X-ray shows signs consistent with COVID-19.
-                                
-                                **Important Note**: This is not a medical diagnosis. Please consult a healthcare professional.
-                            """)
-                        else:
-                            st.success(f"COVID-19 Negative (Confidence: {(100-prediction_percentage):.2f}%)")
-                            st.markdown("""
-                                ✅ This result suggests the X-ray does not show signs consistent with COVID-19.
-                                
-                                **Important Note**: This is not a medical diagnosis. Please consult a healthcare professional.
-                            """)
-                        
-                        # Show prediction probability
-                        st.markdown("### Prediction Probability")
-                        prob_df = {
-                            "COVID-19 Positive": prediction_percentage,
-                            "COVID-19 Negative": 100 - prediction_percentage
-                        }
-                        st.progress(prediction)
-                        
-    # Add disclaimer at the bottom
-    st.markdown("---")
-    st.markdown("""
-    ## Disclaimer
+                    # Fix for st.progress - ensure value is between 0 and 1
+                    try:
+                        # Convert prediction to a float (in case it's a tensor)
+                        pred_value = float(prediction)
+                        # Ensure value is between 0 and 1
+                        pred_value = max(0.0, min(1.0, pred_value))
+                        st.progress(pred_value)
+                    except Exception as e:
+                        st.warning(f"Could not display progress bar. Using text display instead.")
+                        st.text(f"COVID-19 probability: {prediction_percentage:.2f}%")
     
-    This application is for educational and research purposes only. It is not intended for medical diagnosis. 
-    The predictions made by this model should not be used as a substitute for professional medical advice, 
-    diagnosis, or treatment. Always seek the advice of your physician or other qualified health provider 
-    with any questions you may have regarding a medical condition.
+    # Disclaimer section
+    st.header("Disclaimer")
+    with st.container():
+        st.markdown("""
+        This application is for educational and research purposes only. It is not intended for medical diagnosis. 
+        The predictions made by this model should not be used as a substitute for professional medical advice, 
+        diagnosis, or treatment. Always seek the advice of your physician or other qualified health provider 
+        with any questions you may have regarding a medical condition.
+        """)
     
-    ## About the Model
-    
-    This model is a Convolutional Neural Network (CNN) trained on chest X-ray images to detect radiographic 
-    findings associated with COVID-19. The model was trained on a dataset containing both COVID-19 positive 
-    and negative X-ray images.
-    
-    - **Input**: Grayscale chest X-ray images (224x224 pixels)
-    - **Output**: Probability of COVID-19 presence
-    """)
+    # About the model section
+    st.header("About the Model")
+    with st.container():
+        st.markdown("""
+        This model is a Convolutional Neural Network (CNN) trained on chest X-ray images to detect radiographic 
+        findings associated with COVID-19. The model was trained on a dataset containing both COVID-19 positive 
+        and negative X-ray images.
+        
+        - **Input**: Grayscale chest X-ray images (224x224 pixels)
+        - **Output**: Probability of COVID-19 presence
+        """)
 
 if __name__ == "__main__":
     main()
