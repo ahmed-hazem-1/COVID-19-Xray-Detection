@@ -18,7 +18,7 @@ This project uses a Convolutional Neural Network (CNN) to classify chest X-ray i
 ## Try It Online
 
 You can try the application directly in your browser:
-[COVID-19 X-ray Detection App]((https://covid-19-xray-detection.streamlit.app/))
+[COVID-19 X-ray Detection App](https://covid-19-xray-detection.streamlit.app/)
 
 ## How It Works
 
